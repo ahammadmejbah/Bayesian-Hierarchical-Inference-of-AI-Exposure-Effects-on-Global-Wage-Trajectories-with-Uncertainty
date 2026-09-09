@@ -10,3 +10,7 @@ streamlit run app.py
 ```
 
 The app includes salary distributions, observed year-level trajectories, group-level uncertainty summaries, a wage-compression screening view, missingness diagnostics, and filtered-data export. Replace the proxy with a validated exposure index before making causal claims.
+
+## Standalone IEEE-style paper
+
+The repository also includes [paper.html](paper.html), a print-ready HTML reading artifact styled after an IEEE conference paper: US Letter geometry, Times New Roman typography, justified text, two-column flow, IEEE headings, equations, figures, tables, numbered references, Kaggle data availability, and the GitHub project citation. Open it directly in a browser or print it to PDF. For formal submission, convert the manuscript to the target conference's official IEEE LaTeX or Word template and run PDF eXpress validation.

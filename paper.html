@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bayesian Hierarchical Inference of AI Exposure Effects on Global Wage Trajectories with Uncertainty</title>
+<style>
+@page { size: Letter; margin: 0.68in; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #e8e8e8; color: #111; font-family: "Times New Roman", Times, serif; font-size: 10pt; line-height: 1.05; }
+.paper { width: 7.15in; min-height: 9.65in; margin: 24px auto; padding: 0.02in; background: #fff; }
+.title { text-align: center; font-size: 20pt; line-height: 1.08; font-weight: bold; margin: 0 0 15px; }
+.authors { text-align: center; font-size: 9.5pt; margin: 0 0 17px; }
+.abstract, .keywords { text-align: justify; margin: 0 0 8px; }
+.abstract-title, .keywords-title { font-weight: bold; font-style: italic; }
+.columns { column-count: 2; column-gap: 0.24in; text-align: justify; }
+h1 { font-size: 10pt; font-weight: normal; text-align: center; margin: 10px 0 4px; break-after: avoid; }
+h2 { font-size: 10pt; font-style: italic; font-weight: normal; margin: 8px 0 3px; break-after: avoid; }
+p { margin: 0 0 5px; text-indent: 0.14in; }
+h1 + p, h2 + p, .no-indent { text-indent: 0; }
+.equation { text-align: center; margin: 7px 0; break-inside: avoid; font-style: italic; }
+figure { margin: 7px 0; text-align: center; break-inside: avoid; }
+svg { width: 100%; height: auto; border: 0; }
+figcaption { font-size: 8pt; text-align: center; margin-top: 3px; }
+table { width: 100%; border-collapse: collapse; margin: 7px 0; font-size: 8pt; break-inside: avoid; }
+caption { caption-side: top; font-size: 8pt; font-weight: bold; text-align: center; margin-bottom: 3px; }
+th, td { border-top: 1px solid #111; border-bottom: 1px solid #111; padding: 3px 2px; text-align: center; }
+th { font-weight: bold; }
+.references { text-align: left; }
+.references p { text-indent: -0.18in; padding-left: 0.18in; text-align: left; margin-bottom: 4px; }
+.note { border-left: 2px solid #111; padding-left: 6px; margin: 6px 0; }
+@media print { body { background: #fff; } .paper { margin: 0 auto; } }
+@media screen and (max-width: 800px) { .paper { width: auto; min-height: auto; margin: 0; padding: 22px; } .columns { column-count: 1; } }
+</style>
+</head>
+<body>
+<main class="paper">
+  <div class="title">Bayesian Hierarchical Inference of AI Exposure Effects on Global Wage Trajectories with Uncertainty</div>
+  <div class="authors"><strong>Mejbah Ahammad</strong><br>Lead AI Instructor and Research Scientist<br>Independent Research Workspace<br>GitHub: ahammadmejbah</div>
+  <div class="abstract"><span class="abstract-title">Abstract—</span> Generative artificial intelligence has renewed questions about how technology changes the distribution of work and wages. This paper presents an uncertainty-aware research design for studying associations between occupational AI exposure and reported wage trajectories. The planned design combines salary snapshots with a validated occupational exposure index and estimates heterogeneous effects with a Bayesian hierarchical model across countries, sectors, roles, experience levels, and years. The current release contains an exploratory observatory built from 71,913 salary records spanning 2020–2025. It provides descriptive salary summaries, transparent title-based exposure screening, tables, and visual exhibits. Because the external exposure index and full longitudinal linkage are not yet included, this release does not report a causal AI wage effect. It provides a reproducible foundation for the proposed model and identifies the diagnostics required before substantive claims can be made.</div>
+  <div class="keywords"><span class="keywords-title">Index Terms—</span> generative AI, wages, hierarchical Bayesian modeling, measurement error, labor economics, uncertainty quantification, occupational exposure.</div>
+
+  <div class="columns">
+    <h1>I. INTRODUCTION</h1>
+    <p>Generative AI systems are being adopted across occupations that differ in task composition, institutional context, and bargaining power. The same system may automate routine cognitive tasks, complement experienced workers, or create new demand for technical and creative capabilities. A single global AI wage premium therefore risks hiding heterogeneous effects and overstating the precision of available evidence.</p>
+    <p>This study asks: What is the posterior distribution of exposure effects after accounting for salary uncertainty? How do country, sector, role, and experience moderate the relationship? Does model averaging improve prediction over fixed-effects baselines? Which groups have the greatest posterior probability of wage compression or augmentation?</p>
+
+    <h1>II. RELATED WORK</h1>
+    <p>Research on technology and labor markets distinguishes task exposure from realized displacement. Occupational exposure indices, firm adoption studies, and wage-distribution analyses each provide useful but incomplete views. Recent work also emphasizes that generative AI can augment some tasks while substituting for others [1], [2].</p>
+    <p>Two gaps motivate this design. Salary reports are often treated as exact even though they contain measurement and selection error. Sparse country-role cells are often handled with fixed effects that cannot share information efficiently. A hierarchical Bayesian model represents both forms of uncertainty directly [3].</p>
+
+    <h1>III. RESEARCH METHODOLOGY</h1>
+    <h2>A. Research Questions</h2>
+    <p class="no-indent">The analysis estimates global and subgroup exposure associations, evaluates moderation by geography and occupation, compares predictive specifications, and computes posterior probabilities of negative or positive effects.</p>
+    <h2>B. Research Workflow</h2>
+    <p class="no-indent">The workflow validates source records, joins roles to an external exposure score, constructs a panel, fits baseline and hierarchical models, performs posterior checks, and evaluates predictions on held-out time or country-year cells.</p>
+
+    <h1>IV. DATASET AND EXPERIMENTAL SETUP</h1>
+    <h2>A. Dataset Description</h2>
+    <p class="no-indent">The current file contains 71,913 salary records, 104 employee-residence groups, 11 role families, and a median salary of $138,750. The years represented are 2020 through 2025. Fields include USD salary, job title, role family, employee residence, experience level, work mode, employment type, remote ratio, company location, company size, and ISCO group hint.</p>
+    <h2>B. Data Availability</h2>
+    <p class="no-indent">The source dataset is available at <a href="https://www.kaggle.com/datasets/debayank2024/ai-impact-on-jobs-and-salaries-2020-2026">Kaggle: AI Impact on Jobs and Salaries (2020–2026)</a>. The implementation and dashboard are available in the <a href="https://github.com/ahammadmejbah/Bayesian-Hierarchical-Inference-of-AI-Exposure-Effects-on-Global-Wage-Trajectories-with-Uncertainty">author's GitHub repository</a>.</p>
+
+    <h1>V. DATA PREPROCESSING</h1>
+    <p>Year and USD salary are coerced to numeric values. Records without a usable year or salary are excluded from the analysis frame. Positive salary is transformed as log salary to reduce right skew. Missing role and country labels are retained under explicit categories when possible. Duplicate records, impossible values, and cell coverage must be audited before causal modeling.</p>
+    <h2>A. Measurement Error</h2>
+    <p class="no-indent">Self-reported salaries are treated as noisy observations of latent compensation. A role-specific scale permits reporting variance to differ across occupations; repeated reports or source-quality metadata should inform that scale in a future release.</p>
+
+    <h1>VI. EXPLORATORY DATA ANALYSIS</h1>
+    <figure>
+      <svg viewBox="0 0 330 145" role="img" aria-label="Observed median salary by year">
+        <line x1="35" y1="120" x2="315" y2="120" stroke="#111" stroke-width="1"/><line x1="35" y1="15" x2="35" y2="120" stroke="#111" stroke-width="1"/>
+        <polyline points="45,92 95,84 145,73 195,58 245,48 300,38" fill="none" stroke="#111" stroke-width="2"/>
+        <circle cx="45" cy="92" r="3"/><circle cx="95" cy="84" r="3"/><circle cx="145" cy="73" r="3"/><circle cx="195" cy="58" r="3"/><circle cx="245" cy="48" r="3"/><circle cx="300" cy="38" r="3"/>
+        <text x="38" y="136" font-size="9">2020</text><text x="92" y="136" font-size="9">2021</text><text x="142" y="136" font-size="9">2022</text><text x="192" y="136" font-size="9">2023</text><text x="242" y="136" font-size="9">2024</text><text x="292" y="136" font-size="9">2025</text>
+        <text x="106" y="12" font-size="10">Observed median salary trajectory</text>
+      </svg>
+      <figcaption>Fig. 1. Descriptive yearly trajectory from the repository-local salary file. Exact values are available in the Streamlit Observatory.</figcaption>
+    </figure>
+    <p>The trajectory and group comparisons are descriptive exhibits. They may reflect changing sample composition, reporting behavior, exchange-rate conversion, or role mix, and should not be interpreted as an AI treatment effect.</p>
+
+    <h1>VII. FEATURE ENGINEERING</h1>
+    <p>Derived fields include log salary, categorical group identifiers, group-level standard errors, and a transparent title-based exposure screening score. Titles containing AI, machine learning, software, developer, analytics, research, and related terms receive a higher screening score; broader technology and product terms receive a moderate score; other titles receive a lower score.</p>
+    <div class="note">The title-based score is a screening feature only. It is not the Gmyrek et al. occupational exposure index and must not be used as a causal treatment variable.</div>
+
+    <h1>VIII. PROPOSED METHODOLOGY</h1>
+    <p>Let y denote log salary for country i, sector j, role k, year t, and experience level l. The proposed observation model is:</p>
+    <div class="equation">y<sub>ijktl</sub> ~ Normal(mu<sub>ijktl</sub>, sigma<sub>role,k</sub>)</div>
+    <div class="equation">mu = alpha + beta x + alpha<sub>country,i</sub> + alpha<sub>sector,j</sub> + alpha<sub>role,k</sub> + beta<sub>country,i</sub>x + gamma<sub>year,t</sub> + delta<sub>experience,l</sub></div>
+    <p>Group-level priors provide partial pooling. Country slopes capture context-dependent exposure associations, role-level scales represent reporting noise, and autoregressive year effects capture temporal dependence. Shrinkage priors regularize weakly identified exposure coefficients.</p>
+
+    <h1>IX. EXPERIMENTAL SETUP</h1>
+    <p>Baselines should include pooled regression, country and role fixed effects, regularized linear models, and a tree-based predictive benchmark. Hierarchical models should use four chains, prior predictive checks, posterior predictive checks, R-hat, effective sample size, divergence counts, energy diagnostics, and time-aware held-out validation.</p>
+    <h2>A. Evaluation Metrics</h2>
+    <p class="no-indent">Report held-out log predictive density, RMSE or MAE on log salary, interval coverage, interval width, calibration, and the effective sample size behind each probability statement.</p>
+
+    <h1>X. RESULTS AND ANALYSIS</h1>
+    <table><caption>TABLE I<br>DATASET CHARACTERISTICS</caption><thead><tr><th>Characteristic</th><th>Value</th></tr></thead><tbody><tr><td>Salary records</td><td>71,913</td></tr><tr><td>Years</td><td>2020–2025</td></tr><tr><td>Residence groups</td><td>104</td></tr><tr><td>Role families</td><td>11</td></tr><tr><td>Median USD salary</td><td>$138,750</td></tr></tbody></table>
+    <p>Current results are limited to descriptive summaries and data coverage. No posterior AI exposure coefficient, compression probability, or causal wage premium is reported because the external exposure index and full hierarchical model are not included in this release.</p>
+
+    <h1>XI. COMPARATIVE ANALYSIS</h1>
+    <p>The planned comparison evaluates fixed-effects baselines, individual hierarchical specifications, and a stacked ensemble. Leave-one-out cross-validation provides predictive scores and stacking weights. Ensemble intervals must include within-model posterior uncertainty and between-model disagreement.</p>
+    <table><caption>TABLE II<br>PLANNED MODEL COMPARISON</caption><thead><tr><th>Model</th><th>Purpose</th><th>Output</th></tr></thead><tbody><tr><td>Pooled baseline</td><td>Reference association</td><td>Point estimate</td></tr><tr><td>Fixed effects</td><td>Control group differences</td><td>Adjusted estimate</td></tr><tr><td>Hierarchical model</td><td>Partial pooling and uncertainty</td><td>Posterior</td></tr><tr><td>Stacked ensemble</td><td>Model uncertainty</td><td>Predictive distribution</td></tr></tbody></table>
+
+    <h1>XII. DISCUSSION</h1>
+    <p>Observed differences between role or proxy groups can reflect occupation mix, country composition, seniority, company selection, and reporting behavior. The appropriate interpretation is therefore conditional and probabilistic. A null or uncertain result would be scientifically informative and should not be replaced by a stronger narrative.</p>
+
+    <h1>XIII. IMPLICATIONS AND APPLICATIONS</h1>
+    <p>A validated model could support aggregate workforce scenario planning, reskilling prioritization, compensation benchmarking, and policy analysis. Outputs should include uncertainty and coverage warnings. They should not be used to score individual workers, automate employment decisions, or label people as replaceable.</p>
+
+    <h1>XIV. LIMITATIONS</h1>
+    <p>Coverage is uneven across countries, roles, years, and experience levels. Salary reports may reflect selection, nonresponse, and unobserved company characteristics. USD conversion can hide purchasing-power differences. The title proxy can misclassify exposure, and the current file does not provide repeated-person identifiers or a fully defined causal identification strategy.</p>
+
+    <h1>XV. CONCLUSION AND FUTURE WORK</h1>
+    <p>This work establishes a reproducible bridge between labor-market exploration and Bayesian hierarchical inference. Future work will add the validated exposure index, finalize role and ISCO mappings, fit the PyMC or Stan model, compare baselines, validate on held-out years, and publish posterior samples and diagnostics.</p>
+
+    <h1>XVI. CONFLICT OF INTEREST</h1>
+    <p>The author declares no financial conflict of interest related to the salary dataset, exposure-index methodology, or dashboard implementation.</p>
+
+    <h1>REFERENCES</h1>
+    <div class="references">
+      <p>[1] International Labour Organization, “Generative AI and Jobs,” 2023.</p>
+      <p>[2] M. Gmyrek et al., “Generative AI and Jobs: A Global Analysis of Potential Effects on Job Quantity and Quality,” ILO, 2025.</p>
+      <p>[3] A. Gelman et al., <i>Bayesian Data Analysis</i>, 3rd ed. CRC Press, 2013.</p>
+      <p>[4] R. Vehtari, A. Gelman, and J. Gabry, “Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC,” <i>Statistics and Computing</i>, 2017.</p>
+      <p>[5] D. Ahammad, “Bayesian Hierarchical Inference of AI Exposure Effects on Global Wage Trajectories with Uncertainty,” GitHub repository, 2026.</p>
+      <p>[6] D. Debayan, “AI Impact on Jobs and Salaries 2020–2026,” Kaggle dataset, 2026.</p>
+    </div>
+  </div>
+</main>
+</body>
+</html>

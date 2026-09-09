@@ -149,6 +149,19 @@ def render_paper(data: pd.DataFrame) -> None:
         unsafe_allow_html=True,
     )
     st.caption("Reading view · IEEE-inspired double-column layout. The empirical claims below are bounded by the data currently available in this repository.")
+    st.markdown(
+        """
+        <div class="paper-note">
+        <b>Table of Contents</b><br>
+        1. Abstract · 2. Keywords · 3. Introduction · 4. Related Work · 5. Research Methodology ·<br>
+        6. Dataset Description · 7. Data Preprocessing · 8. Exploratory Data Analysis · 9. Feature Engineering ·<br>
+        10. Proposed Methodology · 11. Experimental Setup · 12. Results and Analysis · 13. Comparative Analysis ·<br>
+        14. Discussion · 15. Implications and Applications · 16. Limitations · 17. Conclusion and Future Work ·<br>
+        18. Data Availability · 19. Conflict of Interest · 20. References
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     left, right = st.columns(2, gap="large")
     with left:
@@ -201,6 +214,217 @@ def render_paper(data: pd.DataFrame) -> None:
             <p>[1] International Labour Organization, “Generative AI and Jobs,” 2023.</p>
             <p>[2] M. Gmyrek et al., “Generative AI and Jobs: A Global Analysis of Potential Effects on Job Quantity and Quality,” ILO, 2025.</p>
             <p>[3] A. Gelman et al., <i>Bayesian Data Analysis</i>, 3rd ed. CRC Press, 2013.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("## Detailed analysis protocol")
+    protocol_left, protocol_right = st.columns(2, gap="large")
+    with protocol_left:
+        st.markdown(
+            """
+            <div class="paper-column">
+            <h2>IX. Estimand and Identification</h2>
+            <p>The primary estimand is the change in expected log salary associated with a one-unit increase in occupational exposure, conditional on the observed country, sector, role, experience, and year structure. Country-specific slopes translate the global association into a distribution of context-dependent effects. These are associational estimands unless the exposure design and confounding assumptions are defended with additional evidence.</p>
+            <p>The design does not treat a cross-sectional salary difference as an intervention effect. Identification requires that the exposure index be measured before or independently of the wage outcome, that important confounders be represented or bounded, and that changes in sample composition are not mistaken for wage dynamics. A sensitivity analysis should vary these assumptions explicitly.</p>
+
+            <h2>X. Panel Construction</h2>
+            <p>Each usable record is mapped to a role family, residence country, sector or ISCO group, experience level, and calendar year. Positive USD salaries are transformed as <i>log(wage)</i> to reduce right-skew and interpret coefficients approximately as proportional changes. Duplicate records, impossible values, and missing keys are flagged before analysis rather than silently discarded.</p>
+            <p>For a longitudinal comparison, the pipeline should define whether a record is a repeated snapshot, an independent report, or an aggregate cell. It should also report coverage by country-year-role cell, retain a missingness audit, and prevent future observations from entering a training split used to forecast earlier periods.</p>
+
+            <h2>XI. Measurement Error</h2>
+            <p>Self-reported salaries are modeled as noisy measurements of latent compensation. A role-level scale, σ<sub>role,k</sub>, allows reporting variance to differ across occupations. Where repeated reports or source quality metadata are available, they can inform this scale; otherwise, weakly informative half-normal priors should prevent implausibly precise estimates without overwhelming the data.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with protocol_right:
+        st.markdown(
+            """
+            <div class="paper-column">
+            <h2>XII. Prior Specification</h2>
+            <p>The global intercept receives a broad normal prior on log salary. The global exposure coefficient receives a regularizing normal or horseshoe prior centered at zero. Country and role intercepts and slopes are drawn from shared distributions with half-normal scale priors. Year effects use an autoregressive structure, γ<sub>t</sub> ~ Normal(ρ γ<sub>t−1</sub>, σ<sub>year</sub>), with ρ constrained to a stationary interval.</p>
+            <p>Prior predictive simulation is required before sampling the observed data. It should verify that plausible salary ranges, exposure effects, and between-group variation are represented while extreme values receive low probability. Sensitivity runs should compare regularized normal, Student-t, and horseshoe specifications.</p>
+
+            <h2>XIII. Inference and Diagnostics</h2>
+            <p>The planned sampler uses four chains with warmup and sufficient post-warmup draws for stable tail probabilities. The analysis reports R-hat, effective sample size, divergent transitions, maximum tree depth, energy diagnostics, and Monte Carlo standard error. A model is not treated as converged because a single summary statistic looks acceptable.</p>
+            <p>Posterior predictive checks compare observed and replicated salary distributions, group medians, year trends, and extreme-value behavior. Calibration is assessed on held-out country-year or time-based splits, with interval coverage reported alongside point prediction error.</p>
+
+            <h2>XIV. Model Averaging</h2>
+            <p>Candidate specifications vary random slopes, temporal effects, likelihood tails, and shrinkage priors. Pareto-smoothed leave-one-out cross-validation provides predictive scores and stacking weights. Ensemble intervals must combine both within-model posterior uncertainty and between-model disagreement; weights are not evidence that one specification is true.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown(
+        """
+        <div class="paper-column">
+        <h2>XV. Planned Reporting Standard</h2>
+        <p>Every substantive claim will be accompanied by its estimand, unit of exposure, reference group, posterior mean or median, 95% credible interval, probability of a positive or negative effect, effective sample size, and relevant coverage count. Country and occupation rankings will include uncertainty rather than presenting a deterministic league table.</p>
+        <p>The final report will distinguish three layers of evidence: descriptive patterns in the raw snapshots, model-based associations after adjustment and partial pooling, and predictive performance on held-out data. A result will not be called a “wage premium,” “compression effect,” or “causal impact” unless the corresponding design and assumptions justify that language.</p>
+
+        <h2>XVI. Release Checklist</h2>
+        <p>A complete research release requires: (1) a versioned exposure-index file and mapping table; (2) documented inclusion and exclusion rules; (3) baseline fixed-effects and non-Bayesian benchmarks; (4) prior predictive and posterior predictive plots; (5) convergence and sensitivity tables; (6) time-aware out-of-sample evaluation; (7) posterior samples with an archival checksum; and (8) a data dictionary describing licensing, provenance, and known gaps.</p>
+
+        <h2>XVII. Conclusion</h2>
+        <p>This project provides a practical bridge between exploratory labor-market visualization and a fully specified Bayesian research workflow. The current observatory makes the data structure and uncertainty limits visible. The next scientific step is not to strengthen the narrative around a hypothesized result, but to add the missing exposure measure, execute the preregistered protocol, and let diagnostics determine which conclusions the evidence can support.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown("## Paper sections and empirical exhibits")
+    section_left, section_right = st.columns(2, gap="large")
+    with section_left:
+        st.markdown(
+            f"""
+            <div class="paper-column">
+            <h2>IV. Related Work</h2>
+            <p>Prior work on technology and labor markets spans task-level automation indices, occupational exposure measures, firm adoption studies, and wage-distribution analyses. The literature consistently warns that exposure is not equivalent to displacement: the same technology can substitute for some tasks while complementing others. This project follows that distinction by estimating heterogeneous exposure slopes rather than a single universal premium.</p>
+            <p>Two methodological gaps motivate the design. First, salary observations often contain reporting error that is ignored when point estimates are treated as exact. Second, occupational and geographic heterogeneity is frequently handled with fixed effects that do not share information efficiently across sparse groups. Hierarchical Bayesian inference provides a direct way to represent both uncertainties.</p>
+
+            <h2>V. Research Methodology</h2>
+            <p>The workflow has four stages: validate and document the source data; join each role to an external exposure score; estimate baseline and hierarchical models; and evaluate predictions on held-out time or country-year cells. The application currently implements stage one and a transparent screening version of stage two.</p>
+
+            <h2>VI. Dataset Description</h2>
+            <p>The local file contains <b>{len(data):,}</b> records, {data['employee_residence'].nunique():,} employee-residence countries, {data['role_family'].nunique():,} role families, and years {data['work_year'].min():.0f}–{data['work_year'].max():.0f}. It includes salary in USD, original salary metadata, job title, experience level, employment type, remote ratio, company location, company size, role family, and ISCO group hint.</p>
+
+            <h2>VII. Data Preprocessing</h2>
+            <p>Numeric year and USD salary fields are coerced to numeric types. Records without usable year or positive salary are excluded from the analysis frame. Salary is transformed to log scale for group-level uncertainty summaries. Missing role and country labels are retained under explicit “Other / Unclassified” or “Unknown” categories where appropriate.</p>
+
+            <h2>VIII. Exploratory Data Analysis</h2>
+            <p>The exhibits below show observed salary patterns, not estimates of an AI treatment effect. They are intended to expose coverage, skew, sparse groups, and candidate relationships that the full model must test.</p>
+
+            <h2>IX. Feature Engineering</h2>
+            <p>Derived fields include log salary, a title-based exposure screening score, exposure-proxy bands, categorical group identifiers, and group-level standard errors. The proxy is deliberately interpretable: it is useful for visual triage, but it must be replaced by a validated occupation-level score for formal inference.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with section_right:
+        st.markdown(
+            """
+            <div class="paper-column">
+            <h2>X. Proposed Methodology</h2>
+            <p>The proposed model estimates global, country-specific, sector-specific, role-specific, experience-specific, and year-level components. It uses partial pooling, role-specific observation scales, autoregressive year effects, and regularization for exposure coefficients. Posterior quantities include global and subgroup exposure effects, probabilities of compression, and predictive distributions for future wage trajectories.</p>
+
+            <h2>XI. Experimental Setup</h2>
+            <p>Baseline comparisons should include pooled regression, country and role fixed effects, regularized linear models, and a tree-based predictive benchmark. The hierarchical models should be evaluated with four chains, prior predictive checks, posterior predictive checks, R-hat, effective sample size, divergence counts, and time-aware held-out validation. All preprocessing decisions must be fitted inside each training split.</p>
+
+            <h2>XII. Results and Analysis</h2>
+            <p>Current results are descriptive: the app reports salary medians, log-salary intervals, coverage counts, and trajectories by observed group. No posterior AI exposure coefficient is reported because the required external exposure index is not present in this repository.</p>
+
+            <h2>XIII. Comparative Analysis</h2>
+            <p>The intended comparison is between fixed-effects baselines, single hierarchical specifications, and a stacked ensemble. Performance should be reported with held-out log predictive density, RMSE or MAE on log salary, interval coverage, interval width, and calibration of compression probabilities.</p>
+
+            <h2>XIV. Discussion</h2>
+            <p>Observed differences across proxy bands can reflect occupation mix, country composition, seniority, company selection, or reporting behavior. They should therefore be treated as hypotheses for the full model, not evidence that AI exposure caused a wage change.</p>
+
+            <h2>XV. Implications and Applications</h2>
+            <p>A validated uncertainty-aware model could support workforce scenario planning, reskilling prioritization, compensation benchmarking, and public policy analysis. Outputs should be aggregated, probabilistic, and accompanied by coverage warnings; they should not be used to score individual workers or automate employment decisions.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    yearly_exhibit = data.groupby("work_year", as_index=False).agg(
+        median_salary=("salary_in_usd", "median"),
+        mean_salary=("salary_in_usd", "mean"),
+        observations=("salary_in_usd", "size"),
+    )
+    role_table = data.groupby("role_family", as_index=False).agg(
+        observations=("salary_in_usd", "size"),
+        median_salary=("salary_in_usd", "median"),
+        mean_exposure_proxy=("exposure_proxy", "mean"),
+    ).sort_values("observations", ascending=False).head(12)
+
+    exhibit_top_left, exhibit_top_right = st.columns(2, gap="large")
+    with exhibit_top_left:
+        st.markdown("### Figure 1. Observed salary trajectory")
+        fig = px.line(
+            yearly_exhibit,
+            x="work_year",
+            y=["median_salary", "mean_salary"],
+            markers=True,
+            labels={"value": "Salary (USD)", "work_year": "Work year", "variable": "Statistic"},
+            title="Observed salary trajectory by year",
+        )
+        fig.update_layout(legend_title_text="", margin=dict(l=10, r=10, t=55, b=10))
+        st.plotly_chart(fig, use_container_width=True)
+        st.caption("Source: repository-local Jobs.csv. Descriptive summaries; not causal estimates.")
+    with exhibit_top_right:
+        st.markdown("### Table 1. Highest-volume roles")
+        st.dataframe(
+            role_table.style.format({"median_salary": "${:,.0f}", "mean_exposure_proxy": "{:.2f}"}),
+            use_container_width=True,
+            hide_index=True,
+        )
+        st.caption("Source: repository-local Jobs.csv. Exposure values are title-based screening scores.")
+
+    exhibit_left, exhibit_right = st.columns(2, gap="large")
+    with exhibit_left:
+        st.markdown("### Figure 2. Salary by exposure screening band")
+        proxy_exhibit = data.groupby("exposure_band", observed=False, as_index=False).agg(
+            median_salary=("salary_in_usd", "median"), observations=("salary_in_usd", "size")
+        )
+        fig = px.bar(
+            proxy_exhibit,
+            x="exposure_band",
+            y="median_salary",
+            color="exposure_band",
+            text="observations",
+            category_orders={"exposure_band": ["Lower proxy", "Moderate proxy", "Higher proxy"]},
+            labels={"exposure_band": "Title-based proxy band", "median_salary": "Median salary (USD)"},
+        )
+        fig.update_layout(showlegend=False, margin=dict(l=10, r=10, t=20, b=10))
+        st.plotly_chart(fig, use_container_width=True)
+        st.caption("Source: repository-local Jobs.csv. Proxy bands do not represent validated occupational exposure.")
+    with exhibit_right:
+        st.markdown("### Figure 3. Coverage by experience")
+        experience_exhibit = data["experience_level_label"].value_counts().rename_axis("experience").reset_index(name="observations")
+        fig = px.bar(
+            experience_exhibit,
+            x="experience",
+            y="observations",
+            color="experience",
+            labels={"experience": "Experience level", "observations": "Salary records"},
+        )
+        fig.update_layout(showlegend=False, margin=dict(l=10, r=10, t=20, b=10))
+        st.plotly_chart(fig, use_container_width=True)
+        st.caption("Source: repository-local Jobs.csv. Counts indicate coverage, not population prevalence.")
+
+    final_left, final_right = st.columns(2, gap="large")
+    with final_left:
+        st.markdown(
+            """
+            <div class="paper-column">
+            <h2>XVI. Limitations</h2>
+            <p>The current release lacks the external exposure index, sector normalization, repeated-person identifiers, and a fully defined causal identification strategy. The source may overrepresent workers who report salaries online. Country and role cells are unbalanced, USD conversions may hide local purchasing-power differences, and the title proxy can misclassify exposure. These limitations affect both effect estimates and predictive calibration.</p>
+
+            <h2>XVII. Conclusion and Future Work</h2>
+            <p>This release establishes a reproducible, inspectable research interface. Future work will add the occupation-level exposure data, finalize the panel mapping, fit the hierarchical PyMC model, compare baselines, validate predictions on held-out years, and publish posterior samples with diagnostic artifacts. The project will report what the data support, including null or uncertain effects.</p>
+
+            <h2>XVIII. Data Availability</h2>
+            <p>The source dataset is available through Kaggle: <a href="https://www.kaggle.com/datasets/debayank2024/ai-impact-on-jobs-and-salaries-2020-2026" target="_blank">AI Impact on Jobs and Salaries (2020–2026)</a>. The current repository contains the working CSV used by this dashboard. Users should consult the Kaggle page for provenance, licensing, and any upstream revisions.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with final_right:
+        st.markdown(
+            """
+            <div class="paper-column">
+            <h2>XIX. Conflict of Interest</h2>
+            <p>The author declares no financial conflict of interest related to the salary dataset, exposure-index methodology, or dashboard implementation. This statement should be updated if funding, consulting, employment, or data-provider relationships change.</p>
+
+            <h2>XX. References</h2>
+            <p>[1] International Labour Organization, “Generative AI and Jobs,” 2023.</p>
+            <p>[2] M. Gmyrek et al., “Generative AI and Jobs: A Global Analysis of Potential Effects on Job Quantity and Quality,” ILO, 2025.</p>
+            <p>[3] A. Gelman et al., <i>Bayesian Data Analysis</i>, 3rd ed. CRC Press, 2013.</p>
+            <p>[4] R. Vehtari, A. Gelman, and J. Gabry, “Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC,” <i>Statistics and Computing</i>, 2017.</p>
+            <p>[5] D. Ahammad, “Bayesian Hierarchical Inference of AI Exposure Effects on Global Wage Trajectories with Uncertainty,” GitHub repository, 2026. <a href="https://github.com/ahammadmejbah/Bayesian-Hierarchical-Inference-of-AI-Exposure-Effects-on-Global-Wage-Trajectories-with-Uncertainty" target="_blank">github.com/ahammadmejbah/Bayesian-Hierarchical-Inference-of-AI-Exposure-Effects-on-Global-Wage-Trajectories-with-Uncertainty</a>.</p>
             </div>
             """,
             unsafe_allow_html=True,
