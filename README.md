@@ -11,6 +11,8 @@ streamlit run app.py
 
 The app includes salary distributions, observed year-level trajectories, group-level uncertainty summaries, a wage-compression screening view, missingness diagnostics, and filtered-data export. Replace the proxy with a validated exposure index before making causal claims.
 
+The Observatory also includes an **ML benchmark** tab with 10 classical regressors. Models train on 2020–2024 and evaluate on the held-out 2025 records using MAE, RMSE, R², and MAPE. These are salary-prediction benchmarks, not causal AI-exposure estimates.
+
 ## Standalone IEEE-style paper
 
 The repository also includes [paper.html](paper.html), a print-ready HTML reading artifact styled after an IEEE conference paper: US Letter geometry, Times New Roman typography, justified text, two-column flow, IEEE headings, equations, figures, tables, numbered references, Kaggle data availability, and the GitHub project citation. Open it directly in a browser or print it to PDF. For formal submission, convert the manuscript to the target conference's official IEEE LaTeX or Word template and run PDF eXpress validation.

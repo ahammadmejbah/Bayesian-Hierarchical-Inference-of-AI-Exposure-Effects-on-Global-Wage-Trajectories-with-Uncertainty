@@ -4,6 +4,20 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import (
+    AdaBoostRegressor,
+    ExtraTreesRegressor,
+    GradientBoostingRegressor,
+    HistGradientBoostingRegressor,
+    RandomForestRegressor,
+)
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import ElasticNet, Lasso, LinearRegression, Ridge
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler
 
 
 st.set_page_config(
@@ -14,6 +28,77 @@ st.set_page_config(
 
 
 DATA_PATH = Path(__file__).parent / "Jobs.csv"
+ML_CATEGORICAL = [
+    "experience_level",
+    "employment_type",
+    "role_family",
+    "employee_residence",
+    "company_location",
+    "company_size",
+    "work_mode",
+]
+ML_NUMERIC = ["work_year", "remote_ratio"]
+
+
+@st.cache_data(show_spinner=False)
+def train_classical_models(data: pd.DataFrame) -> pd.DataFrame:
+    features = data[ML_CATEGORICAL + ML_NUMERIC].copy()
+    target = np.log(data["salary_in_usd"].clip(lower=1).astype(float))
+    train_mask = data["work_year"] < data["work_year"].max()
+
+    x_train, x_test = features[train_mask], features[~train_mask]
+    y_train, y_test = target[train_mask], target[~train_mask]
+    actual_salary = data.loc[~train_mask, "salary_in_usd"].to_numpy()
+
+    linear_preprocessor = ColumnTransformer(
+        [
+            ("categorical", Pipeline([
+                ("imputer", SimpleImputer(strategy="most_frequent")),
+                ("onehot", OneHotEncoder(handle_unknown="ignore", min_frequency=5)),
+            ]), ML_CATEGORICAL),
+            ("numeric", Pipeline([
+                ("imputer", SimpleImputer(strategy="median")),
+                ("scale", StandardScaler()),
+            ]), ML_NUMERIC),
+        ]
+    )
+    ordinal_preprocessor = ColumnTransformer(
+        [
+            ("categorical", Pipeline([
+                ("imputer", SimpleImputer(strategy="most_frequent")),
+                ("ordinal", OrdinalEncoder(handle_unknown="use_encoded_value", unknown_value=-1)),
+            ]), ML_CATEGORICAL),
+            ("numeric", SimpleImputer(strategy="median"), ML_NUMERIC),
+        ]
+    )
+
+    models = [
+        ("Linear Regression", linear_preprocessor, LinearRegression()),
+        ("Ridge Regression", linear_preprocessor, Ridge(alpha=10.0)),
+        ("Lasso Regression", linear_preprocessor, Lasso(alpha=0.001, max_iter=3000)),
+        ("Elastic Net", linear_preprocessor, ElasticNet(alpha=0.001, l1_ratio=0.5, max_iter=3000)),
+        ("Random Forest", ordinal_preprocessor, RandomForestRegressor(n_estimators=80, random_state=42, n_jobs=-1, min_samples_leaf=3)),
+        ("Extra Trees", ordinal_preprocessor, ExtraTreesRegressor(n_estimators=80, random_state=42, n_jobs=-1, min_samples_leaf=2)),
+        ("Gradient Boosting", ordinal_preprocessor, GradientBoostingRegressor(n_estimators=120, random_state=42, loss="huber")),
+        ("Hist. Gradient Boosting", ordinal_preprocessor, HistGradientBoostingRegressor(max_iter=150, learning_rate=0.08, random_state=42)),
+        ("AdaBoost", ordinal_preprocessor, AdaBoostRegressor(n_estimators=100, random_state=42, loss="square")),
+        ("K-Nearest Neighbors", ordinal_preprocessor, KNeighborsRegressor(n_neighbors=15, weights="distance", n_jobs=-1)),
+    ]
+
+    results = []
+    for name, preprocessor, estimator in models:
+        model = Pipeline([( "preprocessor", preprocessor), ("model", estimator)])
+        model.fit(x_train, y_train)
+        predictions = np.exp(model.predict(x_test))
+        predictions = np.maximum(predictions, 0)
+        results.append({
+            "Model": name,
+            "MAE (USD)": mean_absolute_error(actual_salary, predictions),
+            "RMSE (USD)": mean_squared_error(actual_salary, predictions) ** 0.5,
+            "R²": r2_score(actual_salary, predictions),
+            "MAPE (%)": np.mean(np.abs((actual_salary - predictions) / actual_salary)) * 100,
+        })
+    return pd.DataFrame(results).sort_values("RMSE (USD)").reset_index(drop=True)
 
 
 def render_footer() -> None:
@@ -549,8 +634,8 @@ metric_cols[1].metric("Median salary", f"${filtered['salary_in_usd'].median():,.
 metric_cols[2].metric("Countries", f"{filtered['employee_residence'].nunique():,}")
 metric_cols[3].metric("Role families", f"{filtered['role_family'].nunique():,}")
 
-tab_overview, tab_hierarchy, tab_risk, tab_data = st.tabs(
-    ["Overview", "Hierarchical summaries", "Compression screen", "Data quality"]
+tab_overview, tab_hierarchy, tab_risk, tab_ml, tab_data = st.tabs(
+    ["Overview", "Hierarchical summaries", "Compression screen", "ML benchmark", "Data quality"]
 )
 
 with tab_overview:
@@ -637,6 +722,31 @@ with tab_risk:
         use_container_width=True,
         hide_index=True,
     )
+
+with tab_ml:
+    st.subheader("10 classical machine-learning models")
+    st.write("Models predict log salary using role, geography, seniority, work mode, year, and remote ratio. Training uses 2020–2024 and the latest year is held out for testing, so the comparison is predictive rather than causal.")
+    with st.spinner("Training ten models on the time-aware split..."):
+        benchmark = train_classical_models(df)
+    st.caption("Five-column performance table: lower MAE, RMSE, and MAPE are better; higher R² is better. Metrics are calculated on the held-out latest year in USD.")
+    st.dataframe(
+        benchmark.style.format({"MAE (USD)": "${:,.0f}", "RMSE (USD)": "${:,.0f}", "R²": "{:.3f}", "MAPE (%)": "{:.1f}%"}),
+        use_container_width=True,
+        hide_index=True,
+    )
+    chart = benchmark.sort_values("RMSE (USD)", ascending=True)
+    fig = px.bar(
+        chart,
+        x="RMSE (USD)",
+        y="Model",
+        orientation="h",
+        color="R²",
+        color_continuous_scale="Tealgrn",
+        title="Held-out RMSE by model",
+        labels={"RMSE (USD)": "RMSE (USD)"},
+    )
+    st.plotly_chart(fig, use_container_width=True)
+    st.info("These are benchmark predictions of reported salaries. They do not estimate the causal effect of AI exposure, and the model features do not include the missing external exposure index.")
 
 with tab_data:
     st.subheader("Coverage and missingness")
